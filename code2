@@ -1,0 +1,32 @@
+data['x'] = list(map(float, data['x']))
+data['y'] = list(map(float, data['y']))
+data['cluster_name'] = list(map(str, data['cluster_name']))
+data['count'] = list(map(int, data['count']))
+data['keyword'] = list(map(str, data['keyword']))
+keyword = []
+for i in range(data.shape[0]):
+    if(len(data.iloc[i]['keyword']) > 15):
+        data.iloc[i]['keyword'].split()
+        keyword.append(data.iloc[i]['keyword'][0:12] + '...')
+    else:
+        keyword.append(data.iloc[i]['keyword'][0:12])
+data['keyword'] = keyword
+data['keyword'][212] = 'oper. stev. nir.'
+areas = list(data['area'].unique())
+for j in areas:
+    k = 0.15
+    l = -0.2
+    area = data[data['area'] == j]
+    plt.figure(figsize=(20, 20), dpi=80)
+    for i in cluster_names:
+        plt.scatter(x=area[area['cluster_name'] == i]['x'], y=area[area['cluster_name'] == i]['y'],
+                    color=area[area['cluster_name'] == i]['color'],
+                    s = area[area['cluster_name'] == i]['count'], alpha=0.5, label=i)
+        plt.title(j)  
+        plt.legend(fontsize='xx-large') 
+    for i in list(area['keyword']):
+        plt.annotate(i, (area[area['keyword'] == i]['x'] + l, area[area['keyword'] == i]['y'] + k))
+        k -= 0.02
+        l -= 0.03
+    plt.savefig(j+'.png', format = 'png')
+    plt.show()
