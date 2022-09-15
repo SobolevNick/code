@@ -1,0 +1,53 @@
+import pandas as pd
+import random
+import matplotlib.pyplot as plt 
+%matplotlib inline
+data = pd.read_excel('Тестовое задание.xlsx')
+data = data.drop('good (1)', axis=1)
+data = data.dropna()
+cluster_names = data['cluster_name'].unique()
+len(cluster_names)
+areas = data['area'].unique()
+color_dict = {}
+for i in areas:
+    colors = ['Green', 'Gray', 'Blue', 'Red', 'Orange', 'Purple']
+    k = 6
+    for j in cluster_names:
+        n = random.randrange(0, k, 1)
+        color_dict[(i, j)] = colors[n]
+        colors.pop(n)
+        k -= 1
+color_list = []
+for i in range(data.shape[0]):
+    for j in color_dict:
+        if((data['area'].iloc[i], data['cluster_name'].iloc[i]) == j):
+            color_list.append(color_dict[j])
+data['color'] = color_list
+data = data.drop_duplicates(subset=['area', 'keyword'])
+data = data[['area', 'cluster', 'cluster_name', 'keyword', 'x', 'y', 'count', 'color']]
+data = data.sort_values(['area', 'cluster', 'cluster_name', 'count'], ascending=[True, True, True, False])
+ind = []
+for i in range(data.shape[0]):
+    if(len(re.findall('\d|.', list(map(str, data['cluster']))[i])) != len(list(map(str, data['cluster']))[i])):
+        ind.append(i)
+data = data.reset_index(drop=True)
+data = data.drop(index=ind)
+ind = []
+for i in range(data.shape[0]):
+    if(len(re.findall('\d|\.', list(map(str, data['x']))[i])) != len(list(map(str, data['x']))[i])):
+        ind.append(i)
+data = data.reset_index(drop=True)
+data = data.drop(index=ind)
+ind = []
+for i in range(data.shape[0]):
+    if(len(re.findall('\d|\.', list(map(str, data['y']))[i])) != len(list(map(str, data['y']))[i])):
+        ind.append(i)
+data = data.reset_index(drop=True)
+data = data.drop(index=ind)
+ind = []
+for i in range(data.shape[0]):
+    if(len(re.findall('\D', list(map(str, data['count']))[i])) != 0):
+        ind.append(i)
+data = data.reset_index(drop=True)
+data = data.drop(index=ind)
+data.to_excel("output.xlsx")
